@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createWorker } from 'tesseract.js';
+import { createWorker} from 'tesseract.js';
+import Tesseract from 'tesseract.js';
 
 interface RecipeScannerProps {
   imageSrc: string;
@@ -19,7 +20,7 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
       
       await worker.setParameters({
         tessedit_ocr_engine_mode: '1',
-        tessedit_pageseg_mode: '1',
+        tessedit_pageseg_mode: Tesseract.PSM.AUTO,
         preserve_interword_spaces: '1',
       });
 
