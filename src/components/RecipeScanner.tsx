@@ -12,6 +12,7 @@ interface RecipeScannerProps {
 const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   const processImage = async () => {
     setIsProcessing(true);
@@ -35,6 +36,7 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
       
       setExtractedText(cleanedText);
       onTextExtracted(cleanedText);
+      setIsEditing(false);
     } catch (error) {
       console.error('OCR processing failed:', error);
       setExtractedText('文字识别失败，请重试 / Texterkennung fehlgeschlagen, bitte erneut versuchen');
@@ -42,6 +44,15 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleTextEdit = (newText: string) => {
+    setExtractedText(newText);
+    onTextExtracted(newText);
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
   };
 
   return (
@@ -81,15 +92,42 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
       
       {extractedText && (
         <div className="backdrop-blur-sm bg-white/80 border border-white/30 p-6 rounded-2xl shadow-xl">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">✓</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">✓</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">Extracted Text</h3>
             </div>
-            <h3 className="text-xl font-bold text-gray-800">Extracted Text</h3>
+            <button
+              onClick={toggleEdit}
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+            >
+              <span className="text-sm">{isEditing ? '💾' : '✏️'}</span>
+              <span>{isEditing ? 'Save' : 'Edit'}</span>
+            </button>
           </div>
-          <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-64 overflow-y-auto">
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{extractedText}</pre>
-          </div>
+          
+          {isEditing ? (
+            <textarea
+              value={extractedText}
+              onChange={(e) => handleTextEdit(e.target.value)}
+              className="w-full h-64 p-4 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl text-sm text-gray-700 leading-relaxed font-mono resize-none focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
+              placeholder="Edit your recipe text here..."
+            />
+          ) : (
+            <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-64 overflow-y-auto">
+              <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{extractedText}</pre>
+            </div>
+          )}
+          
+          {isEditing && (
+            <div className="mt-4 p-3 bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 rounded-lg">
+              <p className="text-sm text-blue-700">
+                💡 <strong>Tip:</strong> You can edit the text to correct any OCR mistakes before saving your recipe.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
