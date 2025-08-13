@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CameraCapture from '@/components/CameraCapture';
 import RecipeScanner from '@/components/RecipeScanner';
 import RecipeStorage from '@/components/RecipeStorage';
 
 type SectionType = 'ingredients' | 'steps';
+
+interface Recipe {
+  id: string;
+  ingredientsText: string;
+  stepsText: string;
+  title: string;
+  createdAt: string;
+}
 
 export default function Home() {
   const [currentSection, setCurrentSection] = useState<SectionType | null>(null);
@@ -13,6 +21,24 @@ export default function Home() {
   const [stepsImage, setStepsImage] = useState<string | null>(null);
   const [ingredientsText, setIngredientsText] = useState<string>('');
   const [stepsText, setStepsText] = useState<string>('');
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
+
+  useEffect(() => {
+    loadSavedRecipes();
+  }, []);
+
+  const loadSavedRecipes = () => {
+    const saved = localStorage.getItem('savedRecipes');
+    if (saved) {
+      setSavedRecipes(JSON.parse(saved));
+    }
+  };
+
+  const deleteRecipe = (id: string) => {
+    const updatedRecipes = savedRecipes.filter(recipe => recipe.id !== id);
+    setSavedRecipes(updatedRecipes);
+    localStorage.setItem('savedRecipes', JSON.stringify(updatedRecipes));
+  };
 
   const handleImageCapture = (imageSrc: string) => {
     if (currentSection === 'ingredients') {
@@ -41,8 +67,8 @@ export default function Home() {
   };
 
   const handleRecipeSaved = () => {
-    // Could optionally reset after saving, or keep the current state
-    // resetApp();
+    loadSavedRecipes(); // Reload recipes after saving
+    // resetApp(); // Could optionally reset after saving
   };
 
   return (
@@ -195,6 +221,65 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Saved Recipes Section */}
+        {savedRecipes.length > 0 && (
+          <div className="mt-16 max-w-6xl mx-auto">
+            <div className="backdrop-blur-sm bg-white/80 border border-white/30 p-8 rounded-2xl shadow-xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold">
+                  {savedRecipes.length}
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800">Your Saved Recipes</h2>
+              </div>
+
+              <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
+                {savedRecipes.map((recipe) => (
+                  <div key={recipe.id} className="group backdrop-blur-sm bg-white/60 border border-white/40 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-bold text-xl text-gray-800 group-hover:text-blue-600 transition-colors duration-300">{recipe.title}</h3>
+                      <button
+                        onClick={() => deleteRecipe(recipe.id)}
+                        className="bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Saved: {new Date(recipe.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="space-y-6">
+                      {/* Ingredients Section */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-lg">🥕</span>
+                          <h4 className="font-semibold text-gray-800">Ingredients</h4>
+                        </div>
+                        <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-40 overflow-y-auto">
+                          <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{recipe.ingredientsText}</pre>
+                        </div>
+                      </div>
+
+                      {/* Steps Section */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-lg">📝</span>
+                          <h4 className="font-semibold text-gray-800">Cooking Steps</h4>
+                        </div>
+                        <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-40 overflow-y-auto">
+                          <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{recipe.stepsText}</pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-16 text-center">
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/50 backdrop-blur-sm rounded-full border border-white/20">
