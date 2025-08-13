@@ -7,9 +7,10 @@ import Tesseract from 'tesseract.js';
 interface RecipeScannerProps {
   imageSrc: string;
   onTextExtracted: (text: string) => void;
+  sectionType?: 'ingredients' | 'steps';
 }
 
-const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted }) => {
+const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted, sectionType }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedText, setExtractedText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -97,7 +98,10 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
               <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm">✓</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-800">Extracted Text</h3>
+              <h3 className="text-xl font-bold text-gray-800">
+              {sectionType === 'ingredients' ? 'Extracted Ingredients' : 
+               sectionType === 'steps' ? 'Extracted Steps' : 'Extracted Text'}
+            </h3>
             </div>
             <button
               onClick={toggleEdit}
@@ -113,7 +117,7 @@ const RecipeScanner: React.FC<RecipeScannerProps> = ({ imageSrc, onTextExtracted
               value={extractedText}
               onChange={(e) => handleTextEdit(e.target.value)}
               className="w-full h-64 p-4 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl text-sm text-gray-700 leading-relaxed font-mono resize-none focus:outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
-              placeholder="Edit your recipe text here..."
+              placeholder={`Edit your ${sectionType || 'recipe'} text here...`}
             />
           ) : (
             <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-64 overflow-y-auto">

@@ -4,19 +4,23 @@ import React, { useState, useEffect } from 'react';
 
 interface Recipe {
   id: string;
-  image: string;
-  text: string;
+  ingredientsImage: string;
+  stepsImage: string;
+  ingredientsText: string;
+  stepsText: string;
   title: string;
   createdAt: string;
 }
 
 interface RecipeStorageProps {
-  image: string;
-  text: string;
+  ingredientsImage: string;
+  stepsImage: string;
+  ingredientsText: string;
+  stepsText: string;
   onSaved: () => void;
 }
 
-const RecipeStorage: React.FC<RecipeStorageProps> = ({ image, text, onSaved }) => {
+const RecipeStorage: React.FC<RecipeStorageProps> = ({ ingredientsImage, stepsImage, ingredientsText, stepsText, onSaved }) => {
   const [title, setTitle] = useState('');
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
   const [showSaved, setShowSaved] = useState(false);
@@ -40,8 +44,10 @@ const RecipeStorage: React.FC<RecipeStorageProps> = ({ image, text, onSaved }) =
 
     const recipe: Recipe = {
       id: Date.now().toString(),
-      image,
-      text,
+      ingredientsImage,
+      stepsImage,
+      ingredientsText,
+      stepsText,
       title: title.trim(),
       createdAt: new Date().toISOString()
     };
@@ -130,22 +136,46 @@ const RecipeStorage: React.FC<RecipeStorageProps> = ({ image, text, onSaved }) =
                       Saved: {new Date(recipe.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="relative group/img">
-                      <img
-                        src={recipe.image}
-                        alt={recipe.title}
-                        className="w-full h-40 object-cover rounded-xl shadow-md group-hover/img:shadow-lg transition-all duration-300"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
-                    </div>
+                  <div className="space-y-6">
+                    {/* Ingredients Section */}
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <span className="text-lg">📄</span>
-                        <h4 className="font-semibold text-gray-800">Recipe Text</h4>
+                        <span className="text-lg">🥕</span>
+                        <h4 className="font-semibold text-gray-800">Ingredients</h4>
                       </div>
-                      <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-32 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{recipe.text}</pre>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="relative group/img">
+                          <img
+                            src={recipe.ingredientsImage}
+                            alt={`${recipe.title} ingredients`}
+                            className="w-full h-32 object-cover rounded-xl shadow-md group-hover/img:shadow-lg transition-all duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-32 overflow-y-auto">
+                          <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{recipe.ingredientsText}</pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Steps Section */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-lg">📝</span>
+                        <h4 className="font-semibold text-gray-800">Cooking Steps</h4>
+                      </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className="relative group/img">
+                          <img
+                            src={recipe.stepsImage}
+                            alt={`${recipe.title} steps`}
+                            className="w-full h-32 object-cover rounded-xl shadow-md group-hover/img:shadow-lg transition-all duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl opacity-0 group-hover/img:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 max-h-32 overflow-y-auto">
+                          <pre className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-mono">{recipe.stepsText}</pre>
+                        </div>
                       </div>
                     </div>
                   </div>
